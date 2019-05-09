@@ -1,0 +1,12 @@
+[Unit]
+Description=Daily mirrors update for DNF
+After=network-online.target
+
+[Timer]
+OnCalendar=daily
+AccuracySec=1d
+Persistent=true
+OnBootSec=5min
+
+[Install]
+WantedBy=timers.target

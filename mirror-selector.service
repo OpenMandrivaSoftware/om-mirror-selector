@@ -1,0 +1,13 @@
+[Unit]
+Description=Update mirrors for DNF
+RequiresMountsFor=/etc
+JobTimeoutSec=15min
+After=network-online.target
+
+[Service]
+Type=idle
+ExecStart=/usr/bin/mirror-selector.sh
+CPUSchedulingPolicy=batch
+Nice=19
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
