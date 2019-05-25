@@ -45,7 +45,7 @@ pinged_mirrors=()
 
 if [ "$(id -u)" != '0' ]; then
     printf '%s\n' 'Please run this script with root privileages.'
-#    exit 1
+    exit 1
 fi
 
 if ! ping -c 1 openmandriva.org &> /dev/null; then
@@ -64,6 +64,6 @@ done
 best_mirror=$(printf '%s\n' "${pinged_mirrors[@]}" | head -n 1)
 
 # update dnf repos with best mirror
-if [ -e /etc/yum.repos.d/{cooker,openmandriva}-*.repo ]; then
-    sed -e "s#^baseurl=.*\/cooker#baseurl=$best_mirror\/cooker#g" -e "s#^baseurl=.*/\$releasever#baseurl=$best_mirror/\$releasever#g" /etc/yum.repos.d/{cooker,openmandriva}-*.repo
+if [ -e /etc/yum.repos.d/cooker-$(uname -m)-*.repo ] || [ -e /etc/yum.repos.d/openmandriva-$(uname -m)-*.repo ]; then
+    sed -i -e "s#^baseurl=.*\/cooker#baseurl=$best_mirror\/cooker#g" -e "s#^baseurl=.*/\$releasever#baseurl=$best_mirror/\$releasever#g" /etc/yum.repos.d/{cooker,openmandriva}-*.repo
 fi
