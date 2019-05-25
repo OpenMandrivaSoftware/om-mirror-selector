@@ -48,7 +48,7 @@ if [ "$(id -u)" != '0' ]; then
     exit 1
 fi
 
-if ! ping -c 1 openmandriva.org &> /dev/null; then
+if ! ping -c 1 example.com &> /dev/null; then
   printf '%s\n' 'Network is not available. Exiting.'
   exit 0
 fi
