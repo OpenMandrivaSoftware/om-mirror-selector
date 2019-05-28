@@ -44,7 +44,7 @@ mirrors=( [1]="ftp://ftp.mirrorservice.org/sites/downloads.openmandriva.org" \
 pinged_mirrors=()
 
 if [ "$(id -u)" != '0' ]; then
-    printf '%s\n' 'Please run this script with root privileages.'
+    printf '%s\n' 'Please run om-mirror-selector.sh with root privileages.'
     exit 1
 fi
 
