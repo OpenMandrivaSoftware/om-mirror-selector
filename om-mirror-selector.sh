@@ -13,40 +13,27 @@
 
 # List of mirrors comes from http://downloads.openmandriva.org/mm/
 # (tpg) status on 2019-05-10 date
-mirrors=( [1]="ftp://ftp.mirrorservice.org/sites/downloads.openmandriva.org" \
-    [2]="http://www.mirrorservice.org/sites/downloads.openmandriva.org" \
-    [3]="http://openmandriva.c3sl.ufpr.br" \
-    [4]="ftp://distrib-coffee.ipsl.jussieu.fr/pub/linux/openmandriva" \
-    [5]="http://distrib-coffee.ipsl.jussieu.fr/pub/linux/openmandriva" \
-    [6]="ftp://ftp-stud.hs-esslingen.de/pub/Mirrors/openmandriva" \
-    [7]="http://ftp-stud.hs-esslingen.de/pub/Mirrors/openmandriva" \
-    [8]="ftp://ftp.tu-chemnitz.de/pub/linux/openmandriva" \
-    [9]="http://ftp.tu-chemnitz.de/pub/linux/openmandriva" \
-    [10]="ftp://ftp.nluug.nl/pub/os/Linux/distr/openmandriva" \
-    [11]="http://ftp.nluug.nl/os/Linux/distr/openmandriva" \
-    [12]="http://mirror.lagoon.nc/pub/openmandriva" \
-    [13]="http://mirror.rise.ph/openmandriva" \
-    [14]="ftp://ftp.icm.edu.pl/pub/Linux/dist/openmandriva" \
-    [15]="http://ftp.icm.edu.pl/pub/Linux/dist/openmandriva" \
-    [16]="ftp://ftp.vectranet.pl/mirror/openmandriva.org" \
-    [17]="http://ftp.vectranet.pl/mirror/openmandriva.org" \
-    [18]="ftp://ftp.pwr.wroc.pl/OpenMandriva" \
-    [19]="http://ftp.pwr.wroc.pl/OpenMandriva" \
-    [20]="ftp://mirror.yandex.ru/openmandriva" \
-    [21]="http://mirror.yandex.ru/openmandriva" \
-    [22]="http://ftp.acc.umu.se/mirror/openmandriva.org" \
-    [23]="ftp://ftp.yzu.edu.tw/Linux/openmandriva" \
-    [24]="http://ftp.yzu.edu.tw/Linux/openmandriva" \
-    [25]="ftp://distro.ibiblio.org/openmandriva" \
-    [26]="http://distro.ibiblio.org/openmandriva" )
+
+# changes by - crazy -
+mirrors=(
+	http://www.mirrorservice.org/sites/downloads.openmandriva.org
+	http://openmandriva.c3sl.ufpr.br
+	http://distrib-coffee.ipsl.jussieu.fr/pub/linux/openmandriva
+	http://ftp-stud.hs-esslingen.de/pub/Mirrors/openmandriva
+	http://ftp.tu-chemnitz.de/pub/linux/openmandriva
+	http://ftp.nluug.nl/pub/os/Linux/distr/openmandriva
+	http://mirror.lagoon.nc/pub/openmandriva
+	http://mirror.rise.ph/openmandriva
+	http://ftp.icm.edu.pl/pub/Linux/dist/openmandriva
+	http://ftp.vectranet.pl/mirror/openmandriva.org
+	http://ftp.pwr.wroc.pl/OpenMandriva
+	http://mirror.yandex.ru/openmandriva
+	http://ftp.acc.umu.se/mirror/openmandriva.org
+	http://ftp.yzu.edu.tw/Linux/openmandriva
+	http://distro.ibiblio.org/openmandriva)
 
 # array with pinged mirrors
-pinged_mirrors=()
-
-if [ "$(id -u)" != '0' ]; then
-    printf '%s\n' 'Please run om-mirror-selector.sh with root privileages.'
-    exit 1
-fi
+declare -A pinged_mirrors
 
 if ! ping -c 1 example.com &> /dev/null; then
   printf '%s\n' 'Network is not available. Exiting.'
@@ -54,16 +41,22 @@ if ! ping -c 1 example.com &> /dev/null; then
 fi
 
 # gathering average ping time for each mirror from array
-for key in "${!mirrors[@]}"; do
-    mirror="${mirrors[$key]}"
-    mirror_aping="$(ping -q -c 3 $(printf '%s\n' "${mirrors[$key]}" | cut -d "/" -f3) | cut -d "/" -s -f5 | cut -d "." -s -f1)"
-    pinged_mirrors+=( [${mirror_aping}]="${mirror}" )
+for key in "${mirrors[@]}"; do
+	mirror="${key}"
+	mirror_aping="$(ping -q -c 3 $(printf '%s\n' "$key" | cut -d "/" -f3) | cut -d "/" -s -f5 | cut -d "." -s -f1)"
+	[[ -n $mirror_aping ]] && \
+		pinged_mirrors+=( [${mirror_aping}]="${mirror}" )
 done
 
 # choose the mirror with lovest key (avg ping value)
 best_mirror=$(printf '%s\n' "${pinged_mirrors[@]}" | head -n 1)
 
-# update dnf repos with best mirror
-if [ -e /etc/yum.repos.d/cooker-$(uname -m)-*.repo ] || [ -e /etc/yum.repos.d/openmandriva-$(uname -m)-*.repo ]; then
-    sed -n -i -e "s#^baseurl=.*\/cooker#baseurl=$best_mirror\/cooker#g" -e "s#^baseurl=.*/\$releasever#baseurl=$best_mirror/\$releasever#g" /etc/yum.repos.d/{cooker,openmandriva}-*.repo
+if [ "$(id -u)" != '0' ]; then
+	printf '%s\n' 'You need root privileages for the next step.'
+	exit 1
+else
+	# update dnf repos with best mirror
+	if [ -e /etc/yum.repos.d/cooker-$(uname -m)-*.repo ] || [ -e /etc/yum.repos.d/openmandriva-$(uname -m)-*.repo ]; then
+		sed -i -e "s#^baseurl=.*\/cooker#baseurl=$best_mirror\/cooker#g" -e "s#^baseurl=.*/\$releasever#baseurl=$best_mirror/\$releasever#g" /etc/yum.repos.d/{cooker,openmandriva}-*.repo
+	fi
 fi
