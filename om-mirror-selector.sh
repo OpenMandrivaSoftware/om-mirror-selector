@@ -22,6 +22,16 @@ MANUAL=false
 DRYRUN=false
 for i in "$@"; do
 	case "$i" in
+	-h|--help)
+		cat <<EOF
+Usage: $0 [-h|--help] [-q|--quiet] [-m|--manual] [-d|--dry-run]
+-h/--help: Display this help text
+-q/--quiet: Quiet mode - don't show progress
+-m/--manual: Pick a mirror manually, don't probe ping latency
+-d/--dry-run: Show what would be done instead of doing it
+EOF
+		exit 0
+		;;
 	-q|--quiet)
 		QUIET=true
 		;;
