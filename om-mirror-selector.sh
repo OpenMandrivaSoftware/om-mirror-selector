@@ -116,11 +116,11 @@ $QUIET || echo "Selecting mirror $best_mirror"
 if $DRYRUN || [ "$(id -u)" != '0' ]; then
 	$DRYRUN || echo 'You need root privileges for the next step.'
 	echo 'Run (as root):'
-	echo "	sed -i -e \"s|^baseurl=.*\/cooker|baseurl=$best_mirror/cooker|g\" -e \"s|^baseurl=.*\/rock|baseurl=$best_mirror/rock|g\" -e \"s|^baseurl=.*\/rolling|baseurl=$best_mirror/rolling|g\" -e \"s|^baseurl=.*/\$releasever|baseurl=$best_mirror/\$releasever|g\" /etc/yum.repos.d/{cooker,openmandriva}-*.repo"
+	echo "	sed -i -e \"s|^baseurl=.*\/cooker|baseurl=$best_mirror/cooker|g\" -e \"s|^baseurl=.*\/rock|baseurl=$best_mirror/rock|g\" -e \"s|^baseurl=.*\/rolling|baseurl=$best_mirror/rolling|g\" -e \"s|^baseurl=.*/\$releasever|baseurl=$best_mirror/\$releasever|g\" /etc/yum.repos.d/openmandriva-*.repo"
 	exit 1
 else
 	# update dnf repos with best mirror
-	if [ -e /etc/yum.repos.d/cooker-$(uname -m)-*.repo ] || [ -e /etc/yum.repos.d/openmandriva-$(uname -m)-*.repo ]; then
-		sed -i -e "s|^baseurl=.*\/cooker|baseurl=$best_mirror/cooker|g" -e "s|^baseurl=.*\/rock|baseurl=$best_mirror/rock|g" -e "s|^baseurl=.*\/rolling|baseurl=$best_mirror/rolling|g" -e "s|^baseurl=.*/\$releasever|baseurl=$best_mirror/\$releasever|g" /etc/yum.repos.d/{cooker,openmandriva}-*.repo
+	if [ -e /etc/yum.repos.d/openmandriva-$(uname -m)-*.repo ]; then
+		sed -i -e "s|^baseurl=.*\/cooker|baseurl=$best_mirror/cooker|g" -e "s|^baseurl=.*\/rock|baseurl=$best_mirror/rock|g" -e "s|^baseurl=.*\/rolling|baseurl=$best_mirror/rolling|g" -e "s|^baseurl=.*/\$releasever|baseurl=$best_mirror/\$releasever|g" /etc/yum.repos.d/openmandriva-*.repo
 	fi
 fi
