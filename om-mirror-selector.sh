@@ -19,18 +19,29 @@
 
 QUIET=false
 MANUAL=false
+AUTOSELECT=false
 DRYRUN=false
+MIRRORLIST=false
 for i in "$@"; do
 	case "$i" in
 	-h|--help)
 		cat <<EOF
 Usage: $0 [-h|--help] [-q|--quiet] [-m|--manual] [-d|--dry-run]
+By default, $0 returns repository configs to using
+the mirror list from mirrors.openmandriva.org.
+
+To do anything else, use the following parameters:
+
+-a/--autoselect: Auto-select mirror with best ping time
 -h/--help: Display this help text
 -q/--quiet: Quiet mode - don't show progress
 -m/--manual: Pick a mirror manually, don't probe ping latency
 -d/--dry-run: Show what would be done instead of doing it
 EOF
 		exit 0
+		;;
+	-a|--autoselect)
+		AUTOSELECT=true
 		;;
 	-q|--quiet)
 		QUIET=true
@@ -83,7 +94,7 @@ if $MANUAL; then
 		[[ "$m" =~ ^[0-9]+$ ]] && best_mirror="${mirrors[$((m-1))]}"
 		[ -z "$best_mirror" ] && echo "Please enter just the number next to the mirror you'd like to use."
 	done
-else
+elif $AUTOSELECT; then
 	# gathering average ping time for each mirror from array
 	best_time=999999999
 	for key in "${mirrors[@]}"; do
@@ -108,19 +119,32 @@ else
 		echo "Could not reach any mirrors. Network down?"
 		exit 1
 	fi
+else
+	MIRRORLIST=true
 fi
 
 $QUIET || echo
-$QUIET || echo "Selecting mirror $best_mirror"
+
+if ! $MIRRORLIST; then
+	$QUIET || echo "Selecting mirror $best_mirror"
+else
+	$QUIET || echo "Using mirrors.openmandriva.org"
+fi
 
 if $DRYRUN || [ "$(id -u)" != '0' ]; then
 	$DRYRUN || echo 'You need root privileges for the next step.'
 	echo 'Run (as root):'
-	echo "	sed -i -e \"s|^baseurl=.*\/cooker|baseurl=$best_mirror/cooker|g\" -e \"s|^baseurl=.*\/rock|baseurl=$best_mirror/rock|g\" -e \"s|^baseurl=.*\/rolling|baseurl=$best_mirror/rolling|g\" -e \"s|^baseurl=.*/\$releasever|baseurl=$best_mirror/\$releasever|g\" /etc/yum.repos.d/openmandriva-*.repo"
+	if $MIRRORLIST; then
+		echo "	sed -i -e \"s|^baseurl=|# baseurl=|;s|^# mirrorlist=|mirrorlist=|\" /etc/yum.repos.d/openmandriva-*.repo"
+	else
+		echo "	sed -i -e \"s|^mirrorlist=|# mirrorlist=|;s|^# baseurl=|baseurl=|\" -e \"s|^baseurl=.*\/cooker|baseurl=$best_mirror/cooker|g\" -e \"s|^baseurl=.*\/rock|baseurl=$best_mirror/rock|g\" -e \"s|^baseurl=.*\/rolling|baseurl=$best_mirror/rolling|g\" -e \"s|^baseurl=.*/\$releasever|baseurl=$best_mirror/\$releasever|g\" /etc/yum.repos.d/openmandriva-*.repo"
+	fi
 	exit 1
 else
 	# update dnf repos with best mirror
-	if [ -e /etc/yum.repos.d/openmandriva-$(uname -m)-*.repo ]; then
-		sed -i -e "s|^baseurl=.*\/cooker|baseurl=$best_mirror/cooker|g" -e "s|^baseurl=.*\/rock|baseurl=$best_mirror/rock|g" -e "s|^baseurl=.*\/rolling|baseurl=$best_mirror/rolling|g" -e "s|^baseurl=.*/\$releasever|baseurl=$best_mirror/\$releasever|g" /etc/yum.repos.d/openmandriva-*.repo
+	if $MIRRORLIST; then
+		sed -i -e "s|^baseurl=|# baseurl=|;s|^# mirrorlist=|mirrorlist=|" /etc/yum.repos.d/openmandriva-*.repo
+	else
+		sed -i -e "s|^mirrorlist=|# mirrorlist=|;s|^# baseurl=|baseurl=|"  -e "s|^baseurl=.*\/cooker|baseurl=$best_mirror/cooker|g" -e "s|^baseurl=.*\/rock|baseurl=$best_mirror/rock|g" -e "s|^baseurl=.*\/rolling|baseurl=$best_mirror/rolling|g" -e "s|^baseurl=.*/\$releasever|baseurl=$best_mirror/\$releasever|g" /etc/yum.repos.d/openmandriva-*.repo
 	fi
 fi
