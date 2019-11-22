@@ -62,8 +62,6 @@ done
 
 mirrors=(
 	http://www.mirrorservice.org/sites/downloads.openmandriva.org
-	http://openmandriva.c3sl.ufpr.br
-	http://distrib-coffee.ipsl.jussieu.fr/pub/linux/openmandriva
 	http://ftp-stud.hs-esslingen.de/pub/Mirrors/openmandriva
 	http://ftp.tu-chemnitz.de/pub/linux/openmandriva
 	http://ftp.nluug.nl/pub/os/Linux/distr/openmandriva
@@ -74,7 +72,6 @@ mirrors=(
 	http://ftp.pwr.wroc.pl/OpenMandriva
 	http://mirror.yandex.ru/openmandriva
 	http://ftp.acc.umu.se/mirror/openmandriva.org
-	http://ftp.yzu.edu.tw/Linux/openmandriva
 	http://distro.ibiblio.org/openmandriva
 	http://abf-downloads.openmandriva.org)
 
