@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # tpgxyz@gmail.com 2019
 # This is only a proof of concept which uses average ping
@@ -60,20 +60,12 @@ EOF
 	shift
 done
 
-mirrors=(
-	http://www.mirrorservice.org/sites/downloads.openmandriva.org
-	http://ftp-stud.hs-esslingen.de/pub/Mirrors/openmandriva
-	http://ftp.tu-chemnitz.de/pub/linux/openmandriva
-	http://ftp.nluug.nl/pub/os/Linux/distr/openmandriva
-	http://mirror.lagoon.nc/pub/openmandriva
-	http://mirror.rise.ph/openmandriva
-	http://ftp.icm.edu.pl/pub/Linux/dist/openmandriva
-	http://ftp.vectranet.pl/mirror/openmandriva.org
-	http://ftp.pwr.wroc.pl/OpenMandriva
-	http://mirror.yandex.ru/openmandriva
-	http://ftp.acc.umu.se/mirror/openmandriva.org
-	http://distro.ibiblio.org/openmandriva
-	http://abf-downloads.openmandriva.org)
+mirrors=( $(curl http://mirrors.openmandriva.org/mirrors.php 2>/dev/null |sed -e 's,/repository.*,,') )
+
+if [ ${#mirrors[@]} = 0 ]; then
+	echo "Couldn't download mirror list - probably the server is down, try again later."
+	exit 1
+fi
 
 # array with pinged mirrors
 declare -A pinged_mirrors
