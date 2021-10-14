@@ -2,14 +2,13 @@
 
 # tpgxyz@gmail.com 2019
 # This is only a proof of concept which uses average ping
-# time for each mirrors from the list and choose one with lovest time
+# time for each mirrors from the list and choose one with lo2est time
 # If anyone want to work on this you may want to make it better:
 # - use geoip to get lattitude and logitude of client and mirrors ip
 # - calculate distance betwwen these two IPs
 # - worth to use https://en.wikipedia.org/wiki/Haversine_formula
 # - grab the data from http://downloads.openmandriva.org/mm/
 # - omit those mirrors which are not up to date
-
 
 # List of mirrors comes from http://downloads.openmandriva.org/mm/
 # (tpg) status on 2019-05-10 date
