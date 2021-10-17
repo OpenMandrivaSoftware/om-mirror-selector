@@ -2,7 +2,7 @@
 
 # tpgxyz@gmail.com 2019
 # This is only a proof of concept which uses average ping
-# time for each mirrors from the list and choose one with lo2est time
+# time for each mirrors from the list and choose one with lowest time
 # If anyone want to work on this you may want to make it better:
 # - use geoip to get lattitude and logitude of client and mirrors ip
 # - calculate distance betwwen these two IPs
