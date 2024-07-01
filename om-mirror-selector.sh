@@ -59,7 +59,7 @@ EOF
 	shift
 done
 
-mirrors=( $(curl http://mirrors.openmandriva.org/mirrors.php 2>/dev/null |sed -e 's,/repository.*,,') )
+mirrors=( $(curl https://mirror.openmandriva.org/README.txt?mirrorlist |grep '<a href=' |sed -e 's,.*<a href=,,' |cut -d'"' -f2 |grep /mirrors/README.txt |sed -e 's,/mirrors/README.txt,,') )
 
 if [ ${#mirrors[@]} = 0 ]; then
 	echo "Couldn't download mirror list - probably the server is down, try again later."
@@ -116,7 +116,7 @@ $QUIET || echo
 if ! $MIRRORLIST; then
 	$QUIET || echo "Selecting mirror $best_mirror"
 else
-	$QUIET || echo "Using mirrors.openmandriva.org"
+	$QUIET || echo "Using mirror.openmandriva.org"
 fi
 
 if $DRYRUN || [ "$(id -u)" != '0' ]; then
